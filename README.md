@@ -4,7 +4,7 @@ ZML Atlas is the public community mining map for the Z Mining Log ecosystem.
 
 Its initial purpose is simple: show **what mining resources have been found, where they were found, and at what claim sizes** using privacy-minimized observations synchronized by ZML Desktop users.
 
-## Planned MVP
+## MVP
 
 - one planet displayed at a time
 - raw claim observations from the last 30 days by default
@@ -13,17 +13,71 @@ Its initial purpose is simple: show **what mining resources have been found, whe
 - claim-size filtering (`1..30`)
 - claim timestamp/age display
 - Discord login for account features
-- desktop sync-token management for authenticated users
+- browser approval flow for connecting ZML Desktop
 
 The first version should show real claim points. Heatmaps, clustering and automatically detected resource fields come after enough real data exists to design them correctly.
 
-## Planned stack
+## Stack
 
-- React
-- TypeScript
+- React + TypeScript
+- Vite
+- deck.gl with `OrthographicView` and Cartesian Entropia X/Y coordinates
+- TanStack Query for server state
+- plain CSS for the initial UI
+- Cloudflare Workers Static Assets + a small Worker/BFF
 - ZML Cloud HTTP API
 
-The map library, styling system, build tooling and deployment provider should be selected when implementation begins rather than fixed without a concrete need.
+Atlas does not use a geographic map engine. Entropia coordinates are planar game coordinates, so deck.gl owns the interactive viewport and GPU-rendered claim layers directly.
+
+## Development
+
+Requirements:
+
+- Node.js 22.12+
+- pnpm 10
+- ZML Cloud on `http://localhost:8080` when testing account/pairing flows
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Vite serves Atlas locally and proxies `/api`, `/oauth2`, `/login`, `/logout`, and `/error` to ZML Cloud. Override the development cloud origin with `ZML_CLOUD_DEV_ORIGIN` when needed.
+
+```bash
+pnpm verify
+```
+
+`verify` runs frontend/Worker linting, the TypeScript + Vite production build, and a Wrangler dry-run bundle validation.
+
+The current bootstrap contains a clearly marked sample-point map preview. Real map observations will replace the fixture once the anonymous public read API exists.
+
+### Desktop pairing
+
+The `/pair?id=<pairing-id>&code=<browser-code>` page is the browser approval side of the ZML Desktop device-style pairing flow. Discord authentication stays on ZML Cloud; Atlas never receives Discord credentials or the final desktop `zml_...` token.
+
+## Cloudflare deployment
+
+`wrangler.jsonc` deploys the Vite `dist` directory as Workers Static Assets with SPA fallback. The Worker runs first only for Cloud-facing routes such as `/api/*` and OAuth/login endpoints; regular frontend assets are served directly from Cloudflare.
+
+Configure the Worker runtime variable `ZML_CLOUD_ORIGIN` to the public ZML Cloud backend origin before using account/pairing routes in a deployed environment.
+
+Useful commands:
+
+```bash
+pnpm deploy:preview
+pnpm deploy
+```
+
+The intended hosted workflow is Cloudflare Workers Builds connected to GitHub:
+
+- repository: `PatrykCieszynski/zml-atlas`
+- production branch: `main`
+- build command: `pnpm build`
+- deploy command: `pnpm exec wrangler deploy`
+- preview branches use Cloudflare's preview-version deployment flow
+
+Do not put the Cloud backend URL into the frontend bundle. Keep `ZML_CLOUD_ORIGIN` as a Worker runtime variable so browser traffic continues to use same-origin Atlas URLs.
 
 ## Ecosystem
 
@@ -37,7 +91,7 @@ flowchart TB
     Desktop -->|privacy-minimized claim sync| Cloud
     Cloud -->|anonymous spatial reads| Atlas
     Discord -->|account identity| Cloud
-    Atlas -->|login/account UI| Cloud
+    Atlas -->|login / pairing approval| Cloud
 ```
 
 ZML Atlas never connects directly to the cloud database. ZML Cloud owns authentication, validation, privacy boundaries and the public map contract.
@@ -51,4 +105,4 @@ ZML Atlas never connects directly to the cloud database. ZML Cloud owns authenti
 
 ## Status
 
-Product and architecture outline only. No frontend implementation has been bootstrapped yet.
+Frontend bootstrap in progress. The map shell, deck.gl planar viewport, TanStack Query boundary, desktop-pairing approval page and Cloudflare Worker/BFF foundation are implemented; public claim reads are the next map slice.
