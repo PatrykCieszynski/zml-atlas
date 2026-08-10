@@ -14,8 +14,5 @@
       "/logout",
       "/error"
     ]
-  },
-  "vars": {
-    "ZML_CLOUD_ORIGIN": "https://example.invalid"
   }
 }
