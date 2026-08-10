@@ -69,7 +69,15 @@ pnpm deploy:preview
 pnpm deploy
 ```
 
-The intended hosted workflow is Cloudflare Workers Builds connected to GitHub: non-production branches create preview versions, while pushes/merges to the configured production branch deploy the production Worker automatically.
+The intended hosted workflow is Cloudflare Workers Builds connected to GitHub:
+
+- repository: `PatrykCieszynski/zml-atlas`
+- production branch: `main`
+- build command: `pnpm build`
+- deploy command: `pnpm exec wrangler deploy`
+- preview branches use Cloudflare's preview-version deployment flow
+
+Do not put the Cloud backend URL into the frontend bundle. Keep `ZML_CLOUD_ORIGIN` as a Worker runtime variable so browser traffic continues to use same-origin Atlas URLs.
 
 ## Ecosystem
 
