@@ -53,10 +53,10 @@ export function AtlasMap() {
         initialViewState={initialViewState}
         layers={[claimLayer]}
         getTooltip={({ object }) => {
-          const claim = object as PreviewClaim | undefined
-          if (claim === undefined) {
+          if (object == null) {
             return null
           }
+          const claim = object as PreviewClaim
           return `${claim.resource}\nSize ${claim.size}\n${claim.x}, ${claim.y}`
         }}
       />
