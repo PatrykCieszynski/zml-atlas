@@ -24,6 +24,7 @@ The first version should show real claim points. Heatmaps, clustering and automa
 - deck.gl with `OrthographicView` and Cartesian Entropia X/Y coordinates
 - TanStack Query for server state
 - plain CSS for the initial UI
+- Cloudflare Workers Static Assets + a small Worker/BFF
 - ZML Cloud HTTP API
 
 Atlas does not use a geographic map engine. Entropia coordinates are planar game coordinates, so deck.gl owns the interactive viewport and GPU-rendered claim layers directly.
@@ -47,11 +48,28 @@ Vite serves Atlas locally and proxies `/api`, `/oauth2`, `/login`, `/logout`, an
 pnpm verify
 ```
 
+`verify` runs frontend/Worker linting, the TypeScript + Vite production build, and a Wrangler dry-run bundle validation.
+
 The current bootstrap contains a clearly marked sample-point map preview. Real map observations will replace the fixture once the anonymous public read API exists.
 
 ### Desktop pairing
 
 The `/pair?id=<pairing-id>&code=<browser-code>` page is the browser approval side of the ZML Desktop device-style pairing flow. Discord authentication stays on ZML Cloud; Atlas never receives Discord credentials or the final desktop `zml_...` token.
+
+## Cloudflare deployment
+
+`wrangler.jsonc` deploys the Vite `dist` directory as Workers Static Assets with SPA fallback. The Worker runs first only for Cloud-facing routes such as `/api/*` and OAuth/login endpoints; regular frontend assets are served directly from Cloudflare.
+
+Configure the Worker runtime variable `ZML_CLOUD_ORIGIN` to the public ZML Cloud backend origin before using account/pairing routes in a deployed environment.
+
+Useful commands:
+
+```bash
+pnpm deploy:preview
+pnpm deploy
+```
+
+The intended hosted workflow is Cloudflare Workers Builds connected to GitHub: non-production branches create preview versions, while pushes/merges to the configured production branch deploy the production Worker automatically.
 
 ## Ecosystem
 
@@ -79,4 +97,4 @@ ZML Atlas never connects directly to the cloud database. ZML Cloud owns authenti
 
 ## Status
 
-Frontend bootstrap in progress. The map shell, deck.gl planar viewport, TanStack Query boundary and desktop-pairing approval page are implemented; public claim reads are the next map slice.
+Frontend bootstrap in progress. The map shell, deck.gl planar viewport, TanStack Query boundary, desktop-pairing approval page and Cloudflare Worker/BFF foundation are implemented; public claim reads are the next map slice.
