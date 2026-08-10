@@ -1,1 +1,33 @@
-{"name":"zml-atlas","private":true,"version":"0.1.0","type":"module","scripts":{"dev":"vite","build":"tsc -b && vite build","lint":"oxlint src worker vite.config.ts","verify:worker":"wrangler deploy --dry-run","verify":"pnpm lint && pnpm build && pnpm verify:worker","preview":"vite preview","deploy":"pnpm build && wrangler deploy","deploy:preview":"pnpm build && wrangler versions upload"},"engines":{"node":">=22.12.0"},"dependencies":{"@deck.gl/core":"^9.3.7","@deck.gl/layers":"^9.3.7","@deck.gl/react":"^9.3.7","@tanstack/react-query":"^5.101.4","react":"^19.2.8","react-dom":"^19.2.8"},"devDependencies":{"@types/node":"^24.13.3","@types/react":"^19.2.17","@types/react-dom":"^19.2.3","@vitejs/plugin-react":"^6.0.4","oxlint":"^1.76.0","typescript":"~6.0.2","vite":"^8.1.5","wrangler":"^4.0.0"}}
+{
+  "name": "zml-atlas",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint src vite.config.ts",
+    "verify": "pnpm lint && pnpm build",
+    "preview": "vite preview"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@deck.gl/core": "^9.3.7",
+    "@deck.gl/layers": "^9.3.7",
+    "@deck.gl/react": "^9.3.7",
+    "@tanstack/react-query": "^5.101.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "oxlint": "^1.76.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.5"
+  }
+}
