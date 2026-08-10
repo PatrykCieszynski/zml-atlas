@@ -16,6 +16,10 @@ Keep the frontend focused on answering:
 Treat these as current requirements unless the user explicitly changes them:
 
 - Frontend: React + TypeScript.
+- Build/dev tooling: Vite.
+- Map renderer: deck.gl directly, using `OrthographicView` and Cartesian game coordinates rather than a geographic map engine.
+- Server state: TanStack Query.
+- Initial styling: plain CSS; do not add a CSS framework without a concrete need.
 - ZML Cloud is the only backend; Atlas never talks directly to PostgreSQL/PostGIS.
 - One planet is displayed at a time.
 - The default public data window is the last 30 days.
@@ -25,7 +29,7 @@ Treat these as current requirements unless the user explicitly changes them:
 - Discord is the MVP login provider for account features.
 - Heatmaps, clustering and automatically detected resource fields are later features based on real data.
 
-Do not choose a map library, state framework, CSS framework or hosting provider until implementation requires the choice. Prefer the smallest dependency set that solves the product need.
+Keep dependencies small. Do not add a second map engine, global state framework, router, design system or CSS framework unless the implementation has a concrete need that the current stack cannot solve cleanly.
 
 ## Privacy boundary
 
@@ -51,7 +55,9 @@ Do not infer or display contributor identity from timing or internal identifiers
 
 The map must query ZML Cloud by planet and visible viewport/bounding box rather than downloading the entire database by default.
 
-Do not request on every pixel of a drag. Debounce or trigger after meaningful viewport changes and cancel/ignore stale requests.
+Do not request on every pixel of a drag. Commit/debounce viewport changes and cancel or ignore stale requests.
+
+React owns controls and application state. deck.gl owns the viewport, layers and point rendering. Do not render every map point as a React component.
 
 The MVP should preserve raw points. If the API reports pagination or truncation, handle it explicitly; never pretend a partial result is the complete observation set.
 
@@ -63,17 +69,21 @@ Planet-specific mapping/calibration should be isolated so different worlds can h
 
 The public map should remain usable without login unless product requirements change.
 
-Discord login is for account capabilities such as viewing/creating/revoking ZML Desktop sync tokens.
+Discord login is for account capabilities and browser approval of ZML Desktop pairing requests.
 
 Do not put Discord client secrets or any backend secret in this public repository or frontend bundle.
 
 Prefer secure server-managed authentication/session behavior. Do not introduce long-lived sensitive tokens in `localStorage` merely for convenience.
+
+Desktop pairing must not expose the final `zml_...` token to Atlas. The browser only approves the short-lived pairing request; the desktop exchanges its separate device secret with ZML Cloud.
 
 ## API boundary
 
 Consume purpose-built public DTOs from ZML Cloud. Do not couple components to cloud database/entity shapes.
 
 Keep API access behind a small typed client layer so endpoint/version changes do not spread through UI components.
+
+During local development, use relative same-origin paths and Vite's proxy to ZML Cloud rather than scattering absolute backend URLs through components.
 
 When a formal OpenAPI contract exists, generated types/client code may replace handwritten transport types.
 
