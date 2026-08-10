@@ -6,9 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "oxlint src vite.config.ts",
-    "verify": "pnpm lint && pnpm build",
-    "preview": "vite preview"
+    "lint": "oxlint src worker vite.config.ts",
+    "verify:worker": "wrangler deploy --dry-run",
+    "verify": "pnpm lint && pnpm build && pnpm verify:worker",
+    "preview": "vite preview",
+    "deploy": "pnpm build && wrangler deploy",
+    "deploy:preview": "pnpm build && wrangler versions upload"
   },
   "engines": {
     "node": ">=22.12.0"
@@ -28,6 +31,7 @@
     "@vitejs/plugin-react": "^6.0.4",
     "oxlint": "^1.76.0",
     "typescript": "~6.0.2",
-    "vite": "^8.1.5"
+    "vite": "^8.1.5",
+    "wrangler": "^4.0.0"
   }
 }
