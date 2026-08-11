@@ -1,6 +1,11 @@
+import { useState } from 'react'
 import { AtlasMap } from '../map/AtlasMap'
+import { PLANET_MAPS, PLANET_OPTIONS, type PlanetId } from '../map/planetConfig'
 
 export function AtlasPage() {
+  const [planetId, setPlanetId] = useState<PlanetId>('calypso')
+  const planet = PLANET_MAPS[planetId]
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -13,15 +18,27 @@ export function AtlasPage() {
         </a>
         <div className="topbar__status">
           <span className="status-dot" />
-          Public preview
+          Live observations
         </div>
       </header>
 
       <section className="atlas-layout">
         <aside className="filter-panel">
           <div className="eyebrow">Planet</div>
-          <h1>Calypso</h1>
+          <h1>{planet.name}</h1>
           <p className="muted">Raw mining observations from the last 30 days.</p>
+
+          <label className="field">
+            <span>Planet</span>
+            <select
+              value={planetId}
+              onChange={(event) => setPlanetId(event.target.value as PlanetId)}
+            >
+              {PLANET_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
+            </select>
+          </label>
 
           <label className="field">
             <span>Resource</span>
@@ -40,15 +57,20 @@ export function AtlasPage() {
           </div>
 
           <div className="panel-note">
-            Filters are scaffolded only. Public Cloud read API is the next map slice.
+            The map loads real observations for the visible viewport. Claim colors identify resources through the shared Cloud catalog; filters are the next Explore slice.
           </div>
         </aside>
 
         <section className="map-panel">
-          <AtlasMap />
+          <AtlasMap key={planetId} planetId={planetId} />
           <div className="map-legend" aria-label="Map legend">
-            <span><i className="legend-dot legend-dot--belkar" /> Belkar Stone</span>
-            <span><i className="legend-dot legend-dot--lysterium" /> Lysterium Stone</span>
+            <span>
+              <i
+                className="legend-dot"
+                style={{ background: 'linear-gradient(135deg, #E8E8E2, #C3C780 45%, #5D77C5 75%, #DA96DA)' }}
+              />
+              Color identifies resource
+            </span>
           </div>
         </section>
       </section>
