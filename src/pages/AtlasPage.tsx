@@ -40,16 +40,20 @@ export function AtlasPage() {
           </div>
 
           <div className="panel-note">
-            The map loads real observations for the visible viewport. Resource colors come from the shared Cloud catalog; filters are the next Explore slice.
+            The map loads real observations for the visible viewport. Claim colors identify resources through the shared Cloud catalog; filters are the next Explore slice.
           </div>
         </aside>
 
         <section className="map-panel">
           <AtlasMap />
           <div className="map-legend" aria-label="Map legend">
-            <span><i className="legend-dot" style={{ background: '#789176' }} /> Ore</span>
-            <span><i className="legend-dot" style={{ background: '#738FAA' }} /> Enmatter</span>
-            <span><i className="legend-dot" style={{ background: '#BA95A2' }} /> Treasure</span>
+            <span>
+              <i
+                className="legend-dot"
+                style={{ background: 'linear-gradient(135deg, #E8E8E2, #C3C780 45%, #5D77C5 75%, #DA96DA)' }}
+              />
+              Color identifies resource
+            </span>
           </div>
         </section>
       </section>
