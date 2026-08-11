@@ -13,7 +13,7 @@ export function AtlasPage() {
         </a>
         <div className="topbar__status">
           <span className="status-dot" />
-          Public preview
+          Live observations
         </div>
       </header>
 
@@ -40,15 +40,14 @@ export function AtlasPage() {
           </div>
 
           <div className="panel-note">
-            Filters are scaffolded only. Public Cloud read API is the next map slice.
+            The map now loads real observations for the visible viewport. Resource and size filters are the next Explore slice.
           </div>
         </aside>
 
         <section className="map-panel">
           <AtlasMap />
           <div className="map-legend" aria-label="Map legend">
-            <span><i className="legend-dot legend-dot--belkar" /> Belkar Stone</span>
-            <span><i className="legend-dot legend-dot--lysterium" /> Lysterium Stone</span>
+            <span><i className="legend-dot legend-dot--belkar" /> Claim observation</span>
           </div>
         </section>
       </section>
