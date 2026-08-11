@@ -3,6 +3,9 @@
   "name": "zml-atlas",
   "main": "worker/index.js",
   "compatibility_date": "2026-08-10",
+  "vars": {
+    "ZML_CLOUD_ORIGIN": "https://zml-cloud.onrender.com"
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
