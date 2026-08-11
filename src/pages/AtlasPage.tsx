@@ -47,9 +47,9 @@ export function AtlasPage() {
         <section className="map-panel">
           <AtlasMap />
           <div className="map-legend" aria-label="Map legend">
-            <span><i className="legend-dot legend-dot--ore" /> Ore</span>
-            <span><i className="legend-dot legend-dot--enmatter" /> Enmatter</span>
-            <span><i className="legend-dot legend-dot--treasure" /> Treasure</span>
+            <span><i className="legend-dot" style={{ background: '#789176' }} /> Ore</span>
+            <span><i className="legend-dot" style={{ background: '#738FAA' }} /> Enmatter</span>
+            <span><i className="legend-dot" style={{ background: '#BA95A2' }} /> Treasure</span>
           </div>
         </section>
       </section>
