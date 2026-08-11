@@ -113,12 +113,6 @@ export function AtlasMap({ planetId }: AtlasMapProps) {
   }, [])
 
   useEffect(() => {
-    const nextViewState = createInitialViewState(config)
-    setViewState(nextViewState)
-    setSettledViewState(nextViewState)
-  }, [config])
-
-  useEffect(() => {
     const timeout = window.setTimeout(() => setSettledViewState(viewState), 250)
     return () => window.clearTimeout(timeout)
   }, [viewState])
