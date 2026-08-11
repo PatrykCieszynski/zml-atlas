@@ -4,6 +4,7 @@ import { COORDINATE_SYSTEM, OrthographicView } from '@deck.gl/core'
 import { BitmapLayer, ScatterplotLayer } from '@deck.gl/layers'
 import { DeckGL } from '@deck.gl/react'
 import { fetchPublicClaims, type PublicClaim } from '../api/claims'
+import { fetchPublicResources } from '../api/resources'
 import {
   CALYPSO_MAP,
   entropiaToMapPixel,
@@ -17,6 +18,10 @@ type AtlasViewState = {
   minZoom: number
   maxZoom: number
 }
+
+type DeckColor = [number, number, number, number]
+
+const FALLBACK_CLAIM_COLOR: DeckColor = [167, 162, 154, 225]
 
 const atlasView = new OrthographicView({
   id: 'atlas-map',
@@ -53,6 +58,21 @@ function createMapTileLayers() {
 function formatObservedAt(value: string) {
   const date = new Date(value)
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString()
+}
+
+function hexToDeckColor(value: string): DeckColor {
+  const match = /^#([0-9a-f]{6})$/i.exec(value)
+  if (match === null) {
+    return FALLBACK_CLAIM_COLOR
+  }
+
+  const rgb = Number.parseInt(match[1], 16)
+  return [
+    (rgb >> 16) & 0xff,
+    (rgb >> 8) & 0xff,
+    rgb & 0xff,
+    225,
+  ]
 }
 
 export function AtlasMap() {
@@ -108,6 +128,17 @@ export function AtlasMap() {
     placeholderData: keepPreviousData,
   })
 
+  const resourcesQuery = useQuery({
+    queryKey: ['public-resources'],
+    queryFn: ({ signal }) => fetchPublicResources(signal),
+    staleTime: 60 * 60 * 1000,
+  })
+
+  const resourcesByKey = useMemo(
+    () => new Map((resourcesQuery.data ?? []).map((resource) => [resource.key, resource])),
+    [resourcesQuery.data],
+  )
+
   const mapTileLayers = useMemo(() => createMapTileLayers(), [])
   const claims = claimsQuery.data?.claims ?? []
 
@@ -118,13 +149,18 @@ export function AtlasMap() {
     getPosition: (claim) => entropiaToMapPixel(CALYPSO_MAP, claim.x, claim.y),
     getRadius: (claim) => Math.max(4, Math.min(10, 3 + claim.size * 0.25)),
     radiusUnits: 'pixels',
-    getFillColor: [91, 192, 190, 225],
+    getFillColor: (claim) => {
+      const resource = resourcesByKey.get(claim.resource)
+      return resource === undefined
+        ? FALLBACK_CLAIM_COLOR
+        : hexToDeckColor(resource.displayColor)
+    },
     getLineColor: [255, 255, 255, 180],
     lineWidthUnits: 'pixels',
     getLineWidth: 1,
     stroked: true,
     pickable: true,
-  }), [claims])
+  }), [claims, resourcesByKey])
 
   let statusLabel = `${claims.length} observations · last 30 days`
   if (claimsQuery.isError) {
@@ -149,7 +185,9 @@ export function AtlasMap() {
             return null
           }
           const claim = object as PublicClaim
-          return `${claim.resource}\nSize ${claim.size}\n${claim.x}, ${claim.y}\n${formatObservedAt(claim.occurredAt)}`
+          const resource = resourcesByKey.get(claim.resource)
+          const resourceLabel = resource?.name ?? claim.resource
+          return `${resourceLabel}\nSize ${claim.size}\n${claim.x}, ${claim.y}\n${formatObservedAt(claim.occurredAt)}`
         }}
       />
       <div className="atlas-map__preview-badge">{statusLabel}</div>
