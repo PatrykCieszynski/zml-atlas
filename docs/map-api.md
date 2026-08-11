@@ -30,13 +30,13 @@ Planet catalog data may later include verified map metadata needed to transform/
 
 ## Raw claim viewport query
 
-MVP endpoint concept:
+Implemented endpoint:
 
 ```text
 GET /api/v1/public/map/claims
 ```
 
-Atlas should send one planet and the current visible bounding box:
+Atlas sends one planet and the current visible bounding box:
 
 ```text
 planet=<planet-key>
@@ -46,18 +46,23 @@ maxX=<number>
 maxY=<number>
 ```
 
-Optional filters conceptually include:
+Implemented optional filters:
 
 ```text
 resource=<resource-key>
 minSize=<1..30>
 maxSize=<1..30>
-from=<timestamp>   default: now - 30 days
-to=<timestamp>     default: now
-cursor=<opaque cursor, if needed>
 ```
 
-The exact encoding for multiple resource filters is intentionally not frozen yet.
+The current resource filter selects one resource key at a time. Multiple-resource encoding is intentionally not frozen yet. Missing size bounds mean the full `1..30` range.
+
+Future query controls may include:
+
+```text
+from=<timestamp>   defaults to now - 30 days
+to=<timestamp>     defaults to now
+cursor=<opaque cursor, if needed>
+```
 
 ## Public observation DTO
 
@@ -107,6 +112,8 @@ map settles after pan/zoom
 
 Debounce/throttle enough to avoid flooding the API while dragging.
 
+Resource and size filters are server-side query inputs. Do not fetch a capped viewport and then pretend client-side filtering represents all matching claims.
+
 ### Raw observations first
 
 The MVP wants raw points rather than a precomputed heatmap.
@@ -125,7 +132,7 @@ Differentiate at least:
 - API/network error
 - partial/paginated result
 
-Do not clear useful currently rendered map data immediately on every refetch if keeping it visible during a short refresh produces a better UX.
+For same-planet, same-filter viewport refreshes, keeping useful points visible during a short refetch is acceptable. When the filter selection changes, do not display stale points from the previous filter as though they matched the new selection.
 
 ## Caching
 

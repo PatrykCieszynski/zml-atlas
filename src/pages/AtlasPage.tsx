@@ -1,10 +1,34 @@
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { fetchPublicResources } from '../api/resources'
 import { AtlasMap } from '../map/AtlasMap'
 import { PLANET_MAPS, PLANET_OPTIONS, type PlanetId } from '../map/planetConfig'
 
+const MIN_CLAIM_SIZE = 1
+const MAX_CLAIM_SIZE = 30
+
+function clampClaimSize(value: number) {
+  return Math.max(MIN_CLAIM_SIZE, Math.min(MAX_CLAIM_SIZE, Math.trunc(value)))
+}
+
 export function AtlasPage() {
   const [planetId, setPlanetId] = useState<PlanetId>('calypso')
+  const [resourceKey, setResourceKey] = useState('all')
+  const [minSize, setMinSize] = useState(MIN_CLAIM_SIZE)
+  const [maxSize, setMaxSize] = useState(MAX_CLAIM_SIZE)
   const planet = PLANET_MAPS[planetId]
+
+  const resourcesQuery = useQuery({
+    queryKey: ['public-resources'],
+    queryFn: ({ signal }) => fetchPublicResources(signal),
+    staleTime: 60 * 60 * 1000,
+  })
+
+  const filters = {
+    resource: resourceKey === 'all' ? undefined : resourceKey,
+    minSize,
+    maxSize,
+  }
 
   return (
     <main className="app-shell">
@@ -42,27 +66,60 @@ export function AtlasPage() {
 
           <label className="field">
             <span>Resource</span>
-            <select disabled defaultValue="all">
+            <select
+              value={resourceKey}
+              onChange={(event) => setResourceKey(event.target.value)}
+              disabled={resourcesQuery.isPending || resourcesQuery.isError}
+            >
               <option value="all">All resources</option>
+              {(resourcesQuery.data ?? []).map((resource) => (
+                <option key={resource.key} value={resource.key}>{resource.name}</option>
+              ))}
             </select>
           </label>
 
           <div className="field">
             <span>Claim size</span>
             <div className="range-row">
-              <input disabled aria-label="Minimum claim size" value="1" readOnly />
+              <input
+                type="number"
+                min={MIN_CLAIM_SIZE}
+                max={MAX_CLAIM_SIZE}
+                aria-label="Minimum claim size"
+                value={minSize}
+                onChange={(event) => {
+                  const nextMin = clampClaimSize(Number(event.target.value))
+                  setMinSize(nextMin)
+                  if (nextMin > maxSize) {
+                    setMaxSize(nextMin)
+                  }
+                }}
+              />
               <span>to</span>
-              <input disabled aria-label="Maximum claim size" value="30" readOnly />
+              <input
+                type="number"
+                min={MIN_CLAIM_SIZE}
+                max={MAX_CLAIM_SIZE}
+                aria-label="Maximum claim size"
+                value={maxSize}
+                onChange={(event) => {
+                  const nextMax = clampClaimSize(Number(event.target.value))
+                  setMaxSize(nextMax)
+                  if (nextMax < minSize) {
+                    setMinSize(nextMax)
+                  }
+                }}
+              />
             </div>
           </div>
 
           <div className="panel-note">
-            The map loads real observations for the visible viewport. Claim colors identify resources through the shared Cloud catalog; filters are the next Explore slice.
+            Filters are applied server-side to the current viewport. Claim colors identify resources through the shared Cloud catalog.
           </div>
         </aside>
 
         <section className="map-panel">
-          <AtlasMap key={planetId} planetId={planetId} />
+          <AtlasMap key={planetId} planetId={planetId} filters={filters} />
           <div className="map-legend" aria-label="Map legend">
             <span>
               <i
