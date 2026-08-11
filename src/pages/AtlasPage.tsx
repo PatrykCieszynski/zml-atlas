@@ -1,6 +1,11 @@
+import { useState } from 'react'
 import { AtlasMap } from '../map/AtlasMap'
+import { PLANET_MAPS, PLANET_OPTIONS, type PlanetId } from '../map/planetConfig'
 
 export function AtlasPage() {
+  const [planetId, setPlanetId] = useState<PlanetId>('calypso')
+  const planet = PLANET_MAPS[planetId]
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -20,8 +25,20 @@ export function AtlasPage() {
       <section className="atlas-layout">
         <aside className="filter-panel">
           <div className="eyebrow">Planet</div>
-          <h1>Calypso</h1>
+          <h1>{planet.name}</h1>
           <p className="muted">Raw mining observations from the last 30 days.</p>
+
+          <label className="field">
+            <span>Planet</span>
+            <select
+              value={planetId}
+              onChange={(event) => setPlanetId(event.target.value as PlanetId)}
+            >
+              {PLANET_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
+            </select>
+          </label>
 
           <label className="field">
             <span>Resource</span>
@@ -45,7 +62,7 @@ export function AtlasPage() {
         </aside>
 
         <section className="map-panel">
-          <AtlasMap />
+          <AtlasMap planetId={planetId} />
           <div className="map-legend" aria-label="Map legend">
             <span>
               <i
