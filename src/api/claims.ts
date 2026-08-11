@@ -18,15 +18,23 @@ export type ClaimsBbox = {
   maxY: number
 }
 
+export type ClaimFilters = {
+  resource?: string
+  minSize: number
+  maxSize: number
+}
+
 type FetchPublicClaimsParams = {
   planet: string
   bbox: ClaimsBbox
+  filters: ClaimFilters
   signal?: AbortSignal
 }
 
 export async function fetchPublicClaims({
   planet,
   bbox,
+  filters,
   signal,
 }: FetchPublicClaimsParams): Promise<PublicClaimsResponse> {
   const query = new URLSearchParams({
@@ -36,6 +44,16 @@ export async function fetchPublicClaims({
     maxX: String(bbox.maxX),
     maxY: String(bbox.maxY),
   })
+
+  if (filters.resource !== undefined) {
+    query.set('resource', filters.resource)
+  }
+  if (filters.minSize > 1) {
+    query.set('minSize', String(filters.minSize))
+  }
+  if (filters.maxSize < 30) {
+    query.set('maxSize', String(filters.maxSize))
+  }
 
   const response = await fetch(`/api/v1/public/map/claims?${query}`, { signal })
 
