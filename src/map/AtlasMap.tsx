@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { COORDINATE_SYSTEM, OrthographicView } from '@deck.gl/core'
 import { BitmapLayer, ScatterplotLayer } from '@deck.gl/layers'
 import { DeckGL } from '@deck.gl/react'
-import { fetchPublicClaims, type PublicClaim } from '../api/claims'
+import { fetchPublicClaims, type ClaimFilters, type PublicClaim } from '../api/claims'
 import { fetchPublicResources } from '../api/resources'
 import {
   PLANET_MAPS,
@@ -25,6 +25,7 @@ type DeckColor = [number, number, number, number]
 
 type AtlasMapProps = {
   planetId: PlanetId
+  filters: ClaimFilters
 }
 
 const FALLBACK_CLAIM_COLOR: DeckColor = [167, 162, 154, 225]
@@ -85,7 +86,7 @@ function hexToDeckColor(value: string): DeckColor {
   ]
 }
 
-export function AtlasMap({ planetId }: AtlasMapProps) {
+export function AtlasMap({ planetId, filters }: AtlasMapProps) {
   const config = PLANET_MAPS[planetId]
   const containerRef = useRef<HTMLDivElement>(null)
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 })
@@ -128,16 +129,29 @@ export function AtlasMap({ planetId }: AtlasMapProps) {
   )
 
   const claimsQuery = useQuery({
-    queryKey: ['public-claims', config.id, bbox],
+    queryKey: [
+      'public-claims',
+      config.id,
+      filters.resource ?? 'all',
+      filters.minSize,
+      filters.maxSize,
+      bbox,
+    ],
     queryFn: ({ signal }) => {
       if (bbox === null) {
         throw new Error('Map viewport is not ready')
       }
-      return fetchPublicClaims({ planet: config.id, bbox, signal })
+      return fetchPublicClaims({ planet: config.id, bbox, filters, signal })
     },
     enabled: bbox !== null,
-    placeholderData: (previousData, previousQuery) =>
-      previousQuery?.queryKey[1] === config.id ? previousData : undefined,
+    placeholderData: (previousData, previousQuery) => {
+      const previousKey = previousQuery?.queryKey
+      const sameFilterContext = previousKey?.[1] === config.id
+        && previousKey?.[2] === (filters.resource ?? 'all')
+        && previousKey?.[3] === filters.minSize
+        && previousKey?.[4] === filters.maxSize
+      return sameFilterContext ? previousData : undefined
+    },
   })
 
   const resourcesQuery = useQuery({
