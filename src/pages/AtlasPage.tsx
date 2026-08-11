@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { type ClaimLookbackDays } from '../api/claims'
-import { fetchPublicResourceDepthRanges } from '../api/resourceDepths'
 import { fetchPublicResources } from '../api/resources'
 import { AtlasMap } from '../map/AtlasMap'
 import { PLANET_MAPS, PLANET_OPTIONS, type PlanetId } from '../map/planetConfig'
@@ -17,10 +16,6 @@ function formatLookback(lookbackDays: ClaimLookbackDays) {
   return lookbackDays === 1 ? '24 hours' : `${lookbackDays} days`
 }
 
-function formatDepth(value: number) {
-  return Number.isInteger(value) ? String(value) : value.toFixed(1)
-}
-
 export function AtlasPage() {
   const [planetId, setPlanetId] = useState<PlanetId>('calypso')
   const [resourceKey, setResourceKey] = useState('all')
@@ -34,17 +29,6 @@ export function AtlasPage() {
     queryFn: ({ signal }) => fetchPublicResources(signal),
     staleTime: 60 * 60 * 1000,
   })
-
-  const depthRangesQuery = useQuery({
-    queryKey: ['public-resource-depth-ranges', planetId],
-    queryFn: ({ signal }) => fetchPublicResourceDepthRanges(planetId, signal),
-    staleTime: 10 * 60 * 1000,
-    enabled: resourceKey !== 'all',
-  })
-
-  const selectedDepthRange = resourceKey === 'all'
-    ? undefined
-    : depthRangesQuery.data?.resources.find((range) => range.resource === resourceKey)
 
   const filters = {
     resource: resourceKey === 'all' ? undefined : resourceKey,
@@ -63,6 +47,10 @@ export function AtlasPage() {
             <small>Community mining map</small>
           </span>
         </a>
+        <nav className="topbar__nav" aria-label="Atlas sections">
+          <a className="topbar__nav-link topbar__nav-link--active" href="/">Explore</a>
+          <a className="topbar__nav-link" href="/resources">Resources</a>
+        </nav>
         <div className="topbar__status">
           <span className="status-dot" />
           Live observations
@@ -112,21 +100,6 @@ export function AtlasPage() {
               ))}
             </select>
           </label>
-
-          {resourceKey !== 'all' && (
-            <div className="panel-note">
-              {depthRangesQuery.isPending && 'Loading observed depth range…'}
-              {depthRangesQuery.isError && 'Observed depth range unavailable.'}
-              {!depthRangesQuery.isPending && !depthRangesQuery.isError && selectedDepthRange === undefined
-                && 'No depth observations yet for this resource.'}
-              {selectedDepthRange !== undefined && (
-                <>
-                  Observed depth: {formatDepth(selectedDepthRange.observedMinDepthM)}–{formatDepth(selectedDepthRange.observedMaxDepthM)} m
-                  {' · '}{selectedDepthRange.sampleCount} {selectedDepthRange.sampleCount === 1 ? 'observation' : 'observations'}
-                </>
-              )}
-            </div>
-          )}
 
           <div className="field">
             <span>Claim size</span>
