@@ -135,6 +135,7 @@ export function AtlasMap({ planetId, filters }: AtlasMapProps) {
       filters.resource ?? 'all',
       filters.minSize,
       filters.maxSize,
+      filters.lookbackDays,
       bbox,
     ],
     queryFn: ({ signal }) => {
@@ -150,6 +151,7 @@ export function AtlasMap({ planetId, filters }: AtlasMapProps) {
         && previousKey?.[2] === (filters.resource ?? 'all')
         && previousKey?.[3] === filters.minSize
         && previousKey?.[4] === filters.maxSize
+        && previousKey?.[5] === filters.lookbackDays
       return sameFilterContext ? previousData : undefined
     },
   })
@@ -188,7 +190,7 @@ export function AtlasMap({ planetId, filters }: AtlasMapProps) {
     pickable: true,
   }), [claims, config, resourcesByKey])
 
-  let statusLabel = `${claims.length} observations · last 30 days`
+  let statusLabel = `${claims.length} observations · last ${filters.lookbackDays} days`
   if (claimsQuery.isError) {
     statusLabel = 'Cloud API unavailable'
   } else if (claimsQuery.isFetching) {
