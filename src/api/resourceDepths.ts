@@ -1,24 +1,21 @@
-export type PublicResourceDepthRange = {
+export type PublicResourceDepthEstimate = {
   resource: string
-  observedMinDepthM: number
-  observedMaxDepthM: number
+  estimatedMinDepthM: number | null
   sampleCount: number
 }
 
-export type PublicResourceDepthRangesResponse = {
-  resources: PublicResourceDepthRange[]
+export type PublicResourceDepthEstimatesResponse = {
+  resources: PublicResourceDepthEstimate[]
 }
 
-export async function fetchPublicResourceDepthRanges(
-  planet: string,
+export async function fetchPublicResourceDepthEstimates(
   signal?: AbortSignal,
-): Promise<PublicResourceDepthRangesResponse> {
-  const query = new URLSearchParams({ planet })
-  const response = await fetch(`/api/v1/public/resources/depth-ranges?${query}`, { signal })
+): Promise<PublicResourceDepthEstimatesResponse> {
+  const response = await fetch('/api/v1/public/resources/depth-estimates', { signal })
 
   if (!response.ok) {
     throw new Error(`Resource depth request failed with HTTP ${response.status}`)
   }
 
-  return response.json() as Promise<PublicResourceDepthRangesResponse>
+  return response.json() as Promise<PublicResourceDepthEstimatesResponse>
 }
