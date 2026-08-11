@@ -155,9 +155,9 @@ export function AtlasMap() {
         ? FALLBACK_CLAIM_COLOR
         : hexToDeckColor(resource.displayColor)
     },
-    getLineColor: [255, 255, 255, 180],
+    getLineColor: [18, 23, 29, 210],
     lineWidthUnits: 'pixels',
-    getLineWidth: 1,
+    getLineWidth: 1.25,
     stroked: true,
     pickable: true,
   }), [claims, resourcesByKey])
