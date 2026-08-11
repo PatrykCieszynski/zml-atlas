@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { type ClaimLookbackDays } from '../api/claims'
 import { fetchPublicResources } from '../api/resources'
 import { AtlasMap } from '../map/AtlasMap'
 import { PLANET_MAPS, PLANET_OPTIONS, type PlanetId } from '../map/planetConfig'
@@ -16,6 +17,7 @@ export function AtlasPage() {
   const [resourceKey, setResourceKey] = useState('all')
   const [minSize, setMinSize] = useState(MIN_CLAIM_SIZE)
   const [maxSize, setMaxSize] = useState(MAX_CLAIM_SIZE)
+  const [lookbackDays, setLookbackDays] = useState<ClaimLookbackDays>(30)
   const planet = PLANET_MAPS[planetId]
 
   const resourcesQuery = useQuery({
@@ -28,6 +30,7 @@ export function AtlasPage() {
     resource: resourceKey === 'all' ? undefined : resourceKey,
     minSize,
     maxSize,
+    lookbackDays,
   }
 
   return (
@@ -50,7 +53,7 @@ export function AtlasPage() {
         <aside className="filter-panel">
           <div className="eyebrow">Planet</div>
           <h1>{planet.name}</h1>
-          <p className="muted">Raw mining observations from the last 30 days.</p>
+          <p className="muted">Raw mining observations from the last {lookbackDays} days.</p>
 
           <label className="field">
             <span>Planet</span>
@@ -61,6 +64,18 @@ export function AtlasPage() {
               {PLANET_OPTIONS.map((option) => (
                 <option key={option.id} value={option.id}>{option.name}</option>
               ))}
+            </select>
+          </label>
+
+          <label className="field">
+            <span>Time range</span>
+            <select
+              value={lookbackDays}
+              onChange={(event) => setLookbackDays(Number(event.target.value) as ClaimLookbackDays)}
+            >
+              <option value={7}>Last 7 days</option>
+              <option value={14}>Last 14 days</option>
+              <option value={30}>Last 30 days</option>
             </select>
           </label>
 
