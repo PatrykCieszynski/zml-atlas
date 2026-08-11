@@ -52,15 +52,17 @@ Implemented optional filters:
 resource=<resource-key>
 minSize=<1..30>
 maxSize=<1..30>
+from=<ISO-8601 timestamp>
+to=<ISO-8601 timestamp>
 ```
 
 The current resource filter selects one resource key at a time. Multiple-resource encoding is intentionally not frozen yet. Missing size bounds mean the full `1..30` range.
 
+The public time window may be at most 30 days. Missing `to` means server time now; missing `from` means 30 days before the effective `to`. Atlas currently exposes presets for the last 7, 14, or 30 days. The 7/14-day presets send `from`; the 30-day preset relies on the backend default. A custom date-range UI can later use the same `from`/`to` contract without changing the endpoint.
+
 Future query controls may include:
 
 ```text
-from=<timestamp>   defaults to now - 30 days
-to=<timestamp>     defaults to now
 cursor=<opaque cursor, if needed>
 ```
 
@@ -98,7 +100,7 @@ Do not issue cross-planet map queries. Each planet has its own game coordinate s
 
 ### Viewport-driven loading
 
-Fetch the visible region rather than the full 30-day dataset on every load.
+Fetch the visible region rather than the full selected time window on every load.
 
 Recommended UI behavior:
 
@@ -112,7 +114,7 @@ map settles after pan/zoom
 
 Debounce/throttle enough to avoid flooding the API while dragging.
 
-Resource and size filters are server-side query inputs. Do not fetch a capped viewport and then pretend client-side filtering represents all matching claims.
+Resource, size, and time filters are server-side query inputs. Do not fetch a capped viewport and then pretend client-side filtering represents all matching claims.
 
 ### Raw observations first
 
@@ -138,7 +140,7 @@ For same-planet, same-filter viewport refreshes, keeping useful points visible d
 
 Planet/resource catalogs change rarely and can be cached aggressively using ordinary HTTP semantics.
 
-Raw claim viewport data is time-sensitive but does not need realtime push for MVP. Short client/server cache windows are acceptable if they do not make the 30-day map confusingly stale.
+Raw claim viewport data is time-sensitive but does not need realtime push for MVP. Short client/server cache windows are acceptable if they do not make the selected recent window confusingly stale.
 
 ## Future spatial APIs
 
