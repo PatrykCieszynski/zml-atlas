@@ -56,11 +56,11 @@ export function ResourcesPage() {
             <div className="eyebrow">Mining catalog</div>
             <h1>Resources</h1>
             <p className="muted">
-              Estimated minimum mining depth from ZML observations. Colors match the Explore map.
+              Estimated global minimum mining depth from ZML observations. Colors match the Explore map.
             </p>
           </div>
           <div className="resources-page__method">
-            Minimum depth is estimated from the shallowest observations rather than a raw minimum, so one bad OCR result cannot define the resource.
+            With 5–9 observations Atlas uses their median. With 10 or more it uses the median of the 10 shallowest observations. Fewer than 5 is shown as not enough data.
           </div>
         </div>
 
