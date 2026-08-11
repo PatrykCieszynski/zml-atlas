@@ -13,6 +13,19 @@ GET /api/v1/public/resources
 
 Use stable machine keys/IDs for requests and display names for UI labels.
 
+Resource catalog items may also carry presentation metadata shared with ZML Desktop:
+
+```json
+{
+  "key": "belkar-stone",
+  "name": "Belkar Stone",
+  "type": "ore",
+  "displayColor": "#789176"
+}
+```
+
+`type` is one of `ore`, `enmatter`, `treasure` or `other`. `displayColor` is a canonical UI hint, not an ingestion requirement. Atlas must tolerate a missing/unknown resource and render a neutral fallback instead of failing the map.
+
 Planet catalog data may later include verified map metadata needed to transform/render game coordinates. Do not invent that metadata before implementation has verified source data.
 
 ## Raw claim viewport query
@@ -58,7 +71,7 @@ size
 occurredAt
 ```
 
-A resource display name may be included for convenience or resolved from the catalog.
+Display name, resource type and color are resolved from the public resource catalog rather than duplicated on each observation.
 
 Never design Atlas around receiving:
 
