@@ -18,7 +18,7 @@ export type ClaimsBbox = {
   maxY: number
 }
 
-export type ClaimLookbackDays = 7 | 14 | 30
+export type ClaimLookbackDays = 1 | 7 | 30
 
 export type ClaimFilters = {
   resource?: string
