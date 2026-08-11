@@ -62,7 +62,7 @@ export function AtlasPage() {
         </aside>
 
         <section className="map-panel">
-          <AtlasMap planetId={planetId} />
+          <AtlasMap key={planetId} planetId={planetId} />
           <div className="map-legend" aria-label="Map legend">
             <span>
               <i
