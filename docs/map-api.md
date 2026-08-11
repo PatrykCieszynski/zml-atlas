@@ -20,11 +20,11 @@ Resource catalog items may also carry presentation metadata shared with ZML Desk
   "key": "belkar-stone",
   "name": "Belkar Stone",
   "type": "ore",
-  "displayColor": "#789176"
+  "displayColor": "#C3C780"
 }
 ```
 
-`type` is one of `ore`, `enmatter`, `treasure` or `other`. `displayColor` is a canonical UI hint, not an ingestion requirement. Atlas must tolerate a missing/unknown resource and render a neutral fallback instead of failing the map.
+`type` is one of `ore`, `enmatter`, `treasure` or `other`. `displayColor` is a canonical UI hint, not an ingestion requirement. Known resources can use resource-specific colors while category colors remain useful fallbacks for uncatalogued or newly introduced resources. Atlas must tolerate a missing/unknown resource and render a neutral fallback instead of failing the map.
 
 Planet catalog data may later include verified map metadata needed to transform/render game coordinates. Do not invent that metadata before implementation has verified source data.
 
