@@ -1,0 +1,40 @@
+name: Import map assets
+
+on:
+  push:
+    branches:
+      - agent/explore-real-claims
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Atlas branch
+        uses: actions/checkout@v6
+        with:
+          ref: agent/explore-real-claims
+
+      - name: Copy map tiles from ZML Desktop repo
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/PatrykCieszynski/ZML.git /tmp/zml
+          cd /tmp/zml
+          git sparse-checkout set apps/desktop/public/Maps
+          cd "$GITHUB_WORKSPACE"
+          rm -rf public/Maps
+          mkdir -p public
+          cp -R /tmp/zml/apps/desktop/public/Maps public/Maps
+          find public/Maps -type f ! -name '*.webp' -delete
+          find public/Maps -type d -empty -delete
+          rm .github/workflows/import-map-assets.yml
+
+      - name: Commit imported assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/Maps .github/workflows/import-map-assets.yml
+          git commit -m "chore: bundle map tiles"
+          git push origin HEAD:agent/explore-real-claims
