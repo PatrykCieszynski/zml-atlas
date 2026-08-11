@@ -1,3 +1,4 @@
+import '../resourceStyles.css'
 import { AtlasPage } from '../pages/AtlasPage'
 import { PairingPage } from '../pages/PairingPage'
 import { ResourcesPage } from '../pages/ResourcesPage'
