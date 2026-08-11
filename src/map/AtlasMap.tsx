@@ -71,6 +71,10 @@ function formatObservedAt(value: string) {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString()
 }
 
+function formatLookback(lookbackDays: ClaimFilters['lookbackDays']) {
+  return lookbackDays === 1 ? '24 hours' : `${lookbackDays} days`
+}
+
 function hexToDeckColor(value: string): DeckColor {
   const match = /^#([0-9a-f]{6})$/i.exec(value)
   if (match === null) {
@@ -190,7 +194,7 @@ export function AtlasMap({ planetId, filters }: AtlasMapProps) {
     pickable: true,
   }), [claims, config, resourcesByKey])
 
-  let statusLabel = `${claims.length} observations · last ${filters.lookbackDays} days`
+  let statusLabel = `${claims.length} observations · last ${formatLookback(filters.lookbackDays)}`
   if (claimsQuery.isError) {
     statusLabel = 'Cloud API unavailable'
   } else if (claimsQuery.isFetching) {
