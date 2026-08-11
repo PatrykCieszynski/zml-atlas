@@ -16,9 +16,6 @@ export type PlanetMapConfig = {
   tileUrl: (x: number, y: number) => string
 }
 
-const desktopMapCommit = 'ca55edee1e48589012e947f9fae63685fd88bc7b'
-const desktopMapRoot = `https://raw.githubusercontent.com/PatrykCieszynski/ZML/${desktopMapCommit}/apps/desktop/public/Maps`
-
 export const CALYPSO_MAP: PlanetMapConfig = {
   id: 'calypso',
   name: 'Calypso',
@@ -40,7 +37,7 @@ export const CALYPSO_MAP: PlanetMapConfig = {
     [7, 0], [7, 1], [7, 2], [7, 3],
     [8, 0], [8, 1], [8, 2],
   ],
-  tileUrl: (x, y) => `${desktopMapRoot}/Calypso/x${x}_y${y}.webp`,
+  tileUrl: (x, y) => `/Maps/Calypso/x${x}_y${y}.webp`,
 }
 
 export function getMapSizePx(config: PlanetMapConfig) {
