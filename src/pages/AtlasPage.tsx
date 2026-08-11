@@ -12,6 +12,10 @@ function clampClaimSize(value: number) {
   return Math.max(MIN_CLAIM_SIZE, Math.min(MAX_CLAIM_SIZE, Math.trunc(value)))
 }
 
+function formatLookback(lookbackDays: ClaimLookbackDays) {
+  return lookbackDays === 1 ? '24 hours' : `${lookbackDays} days`
+}
+
 export function AtlasPage() {
   const [planetId, setPlanetId] = useState<PlanetId>('calypso')
   const [resourceKey, setResourceKey] = useState('all')
@@ -53,7 +57,7 @@ export function AtlasPage() {
         <aside className="filter-panel">
           <div className="eyebrow">Planet</div>
           <h1>{planet.name}</h1>
-          <p className="muted">Raw mining observations from the last {lookbackDays} days.</p>
+          <p className="muted">Raw mining observations from the last {formatLookback(lookbackDays)}.</p>
 
           <label className="field">
             <span>Planet</span>
@@ -73,8 +77,8 @@ export function AtlasPage() {
               value={lookbackDays}
               onChange={(event) => setLookbackDays(Number(event.target.value) as ClaimLookbackDays)}
             >
+              <option value={1}>Last 24 hours</option>
               <option value={7}>Last 7 days</option>
-              <option value={14}>Last 14 days</option>
               <option value={30}>Last 30 days</option>
             </select>
           </label>
