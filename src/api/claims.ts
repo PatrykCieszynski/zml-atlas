@@ -18,10 +18,13 @@ export type ClaimsBbox = {
   maxY: number
 }
 
+export type ClaimLookbackDays = 7 | 14 | 30
+
 export type ClaimFilters = {
   resource?: string
   minSize: number
   maxSize: number
+  lookbackDays: ClaimLookbackDays
 }
 
 type FetchPublicClaimsParams = {
@@ -30,6 +33,8 @@ type FetchPublicClaimsParams = {
   filters: ClaimFilters
   signal?: AbortSignal
 }
+
+const DAY_MS = 24 * 60 * 60 * 1000
 
 export async function fetchPublicClaims({
   planet,
@@ -53,6 +58,9 @@ export async function fetchPublicClaims({
   }
   if (filters.maxSize < 30) {
     query.set('maxSize', String(filters.maxSize))
+  }
+  if (filters.lookbackDays < 30) {
+    query.set('from', new Date(Date.now() - filters.lookbackDays * DAY_MS).toISOString())
   }
 
   const response = await fetch(`/api/v1/public/map/claims?${query}`, { signal })
