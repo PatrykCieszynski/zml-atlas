@@ -40,14 +40,16 @@ export function AtlasPage() {
           </div>
 
           <div className="panel-note">
-            The map now loads real observations for the visible viewport. Resource and size filters are the next Explore slice.
+            The map loads real observations for the visible viewport. Resource colors come from the shared Cloud catalog; filters are the next Explore slice.
           </div>
         </aside>
 
         <section className="map-panel">
           <AtlasMap />
           <div className="map-legend" aria-label="Map legend">
-            <span><i className="legend-dot legend-dot--belkar" /> Claim observation</span>
+            <span><i className="legend-dot legend-dot--ore" /> Ore</span>
+            <span><i className="legend-dot legend-dot--enmatter" /> Enmatter</span>
+            <span><i className="legend-dot legend-dot--treasure" /> Treasure</span>
           </div>
         </section>
       </section>
