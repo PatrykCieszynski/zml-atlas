@@ -47,6 +47,10 @@ export function AtlasPage() {
             <small>Community mining map</small>
           </span>
         </a>
+        <nav className="topbar__nav" aria-label="Atlas sections">
+          <a className="topbar__nav-link topbar__nav-link--active" href="/">Explore</a>
+          <a className="topbar__nav-link" href="/resources">Resources</a>
+        </nav>
         <div className="topbar__status">
           <span className="status-dot" />
           Live observations
